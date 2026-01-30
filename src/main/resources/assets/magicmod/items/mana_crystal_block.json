@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "magicmod:item/mana_crystal_block"
+  }
+}

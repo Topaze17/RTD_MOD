@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "magicmod:block/mana_crystal_block" }
+  }
+}

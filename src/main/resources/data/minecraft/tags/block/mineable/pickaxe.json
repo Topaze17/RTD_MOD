@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "magicmod:mana_crystal_block",
+    "magicmod:fire_crystal_block"
+  ]
+}
