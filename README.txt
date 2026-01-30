@@ -44,3 +44,7 @@ Community Documentation: https://docs.minecraftforge.net/en/latest/gettingstarte
 LexManos' Install Video: https://youtu.be/8VEdtQLuLO0
 Forge Forums: https://forums.minecraftforge.net/
 Forge Discord: https://discord.minecraftforge.net/
+
+Note from modders:
+=============================
+this is a mod aim to add magic into minecraft and will be develloped slowly by a group of friends.
