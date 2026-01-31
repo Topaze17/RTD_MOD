@@ -12,9 +12,6 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-import java.util.Arrays;
-import java.util.Set;
-
 import static com.example.magicmod.MagicMod.MODID;
 
 public class ModBlockRegister {

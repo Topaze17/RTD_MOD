@@ -1,8 +1,6 @@
 package com.example.magicmod.item.register;
 
 import com.example.magicmod.MagicMod;
-import com.example.magicmod.block.register.ModBlockRegister;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.registries.DeferredRegister;
