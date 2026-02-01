@@ -24,8 +24,8 @@ public class ModPotion {
 
     /**
      * Mana Potion.
-     * Applies the Mana Regeneration effect for 200 ticks (10 seconds) at level 0.
-     * When consumed, grants the player experience points over time.
+     * Applies the Mana Regeneration effect for 200 ticks (10 seconds).
+     * When consumed, grants the player mana points over time.
      */
     public static final RegistryObject<Potion> MANA_POTION = POTIONS.register("mana_potion",
             () -> new Potion( "mana_potion",new MobEffectInstance(ModEffects.MANA_REGENERATION.getHolder().get(), 200, 0)));
