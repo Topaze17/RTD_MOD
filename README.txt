@@ -48,3 +48,4 @@ Forge Discord: https://discord.minecraftforge.net/
 Note from modders:
 =============================
 this is a mod aim to add magic into minecraft and will be develloped slowly by a group of friends.
+Forge version 1.21.11-61.0.8
