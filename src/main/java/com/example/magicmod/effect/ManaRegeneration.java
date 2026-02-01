@@ -1,5 +1,6 @@
 package com.example.magicmod.effect;
 
+import com.example.magicmod.capabilities.ModCapabilities;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -37,7 +38,7 @@ public class ManaRegeneration extends MobEffect {
     public boolean applyEffectTick(ServerLevel pServerLevel, LivingEntity pLivingEntity, int pAmplifier) {
 
         if (pLivingEntity instanceof ServerPlayer player) {
-            player.giveExperiencePoints(1);
+            player.getCapability(ModCapabilities.MANA).ifPresent(m -> m.addMana( player, 1));
         }
 
         return true;

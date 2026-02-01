@@ -36,7 +36,7 @@ public class ModPotion {
      *
      * @param busGroup The mod event bus group to register potions to
      */
-    public static void registerItem(BusGroup busGroup) {
+    public static void registerPotion(BusGroup busGroup) {
         POTIONS.register(busGroup);
     }
 

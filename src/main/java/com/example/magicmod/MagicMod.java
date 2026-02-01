@@ -71,7 +71,7 @@ public final class MagicMod {
         // Register the Deferred Register to the mod event bus so effects get registered
         ModEffects.registerEffect(modBusGroup);
         // Register to the mod event bus potions and recipes
-        ModPotion.registerItem(modBusGroup);
+        ModPotion.registerPotion(modBusGroup);
 
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modBusGroup);
