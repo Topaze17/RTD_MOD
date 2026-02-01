@@ -1,12 +1,16 @@
 package com.example.magicmod.block.crystal;
 
+import com.example.magicmod.capabilities.ModCapabilities;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -47,14 +51,17 @@ public class FireCrystalBlock extends CrystalBlock {
         if (level.isClientSide()) return;
         MinecraftServer minecraftServer = level.getServer();
         if(minecraftServer == null) return;
-        DamageSource damageSource = level.damageSources().inFire();
-        entity.hurtServer(level.getServer().overworld(),damageSource, 1f);
-    }
-    @Override
-    public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
-        if (level.isClientSide()) return;
-        MinecraftServer minecraftServer = level.getServer();
-        if(minecraftServer == null) return;
+        //condition added to have some kind of interaction of mana for debug purpose
+        //TODO remove when no more the only interaction with mana.
+        if(entity instanceof Player) {
+            if(entity instanceof ServerPlayer) {
+                entity.getCapability(ModCapabilities.MANA).ifPresent(m -> m.addMana((ServerPlayer) entity, -1));
+            }
+            else {
+                entity.getCapability(ModCapabilities.MANA).ifPresent(m -> m.addMana(-1));
+            }
+
+        }
         DamageSource damageSource = level.damageSources().inFire();
         entity.hurtServer(level.getServer().overworld(),damageSource, 1f);
     }
