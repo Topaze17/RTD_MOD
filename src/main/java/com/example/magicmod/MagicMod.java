@@ -1,15 +1,23 @@
 package com.example.magicmod;
 
+import com.example.magicmod.capabilities.mana.ManaProvider;
 import com.example.magicmod.block.register.ModBlockRegister;
 import com.example.magicmod.item.register.ModItemRegister;
+import com.example.magicmod.network.NetworkHandler;
+import com.example.magicmod.network.Sync;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -76,7 +84,8 @@ public final class MagicMod {
             LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
 
         LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
-
+        //register network handler to handle packet between server and client
+        event.enqueueWork(NetworkHandler::register);
         Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
     }
 
@@ -97,6 +106,32 @@ public final class MagicMod {
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        }
+    }
+    /**
+     * Class that represent event that append on server and how we want to add interaction if those event trigger
+     * */
+    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class ServerModEvents {
+        /**
+         * things that append when the event to attach capabilities trigger (use to add our mod capabilities)
+         * */
+        @SubscribeEvent
+        public static void onAttachCapabilities(AttachCapabilitiesEvent event) {
+            if (event.getObject() instanceof Player) {
+                ManaProvider provider = new ManaProvider();
+                event.addCapability(Identifier.parse("magicmod:mana"), provider);
+                event.addListener(provider::invalidate);
+            }
+        }
+        /**
+         * things that append when the login event trigger
+         * */
+        @SubscribeEvent
+        public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
+            if (event.getEntity() instanceof ServerPlayer sp) {
+                Sync.syncManaTo(sp);
+            }
         }
     }
 }

@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.example.magicmod.HudOverlay.mixin",
+  "refmap": "magicmod.refmap.json",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "ManaHudMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
