@@ -35,12 +35,14 @@ public class Mana implements IMana {
 
     @Override
     public void addMana(ServerPlayer player, int value) {
+        if (player.isCreative() || player.isSpectator()) return;
         setMana(mana + value);
         Sync.syncManaTo(player);
     }
 
     @Override
     public void addMaxMana(ServerPlayer player, int value) {
+        if (player.isCreative() || player.isSpectator()) return;
         setMaxMana(maxMana + value);
         Sync.syncManaTo(player);
     }

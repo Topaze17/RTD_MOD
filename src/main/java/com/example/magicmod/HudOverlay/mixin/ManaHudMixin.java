@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.GameType;
 import net.minecraftforge.common.util.LazyOptional;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,15 +39,16 @@ public abstract class ManaHudMixin {
         if (mc.player == null) return;
         if (mc.options.hideGui) return;
         LazyOptional<IMana> mana = mc.player.getCapability(ModCapabilities.MANA);
-        if(mana.isPresent()) {
-            mc.player.getCapability(ModCapabilities.MANA).ifPresent(m -> {
-                Component text = Component.literal("Mana: " + m.getMana() + " / " + m.getMaxMana());
+        if (!mc.player.isCreative() && !mc.player.isSpectator()) {
+            if (mana.isPresent()) {
+                mc.player.getCapability(ModCapabilities.MANA).ifPresent(m -> {
+                    Component text = Component.literal("Mana: " + m.getMana() + " / " + m.getMaxMana());
+                    graphics.drawString(mc.font, text, 10, 10, 0xFFFFFFFF, true);
+                });
+            } else {
+                Component text = Component.literal("Mana: " + ManaClientCache.mana + " / " + ManaClientCache.maxMana);
                 graphics.drawString(mc.font, text, 10, 10, 0xFFFFFFFF, true);
-            });
-        }
-        else {
-            Component text = Component.literal("Mana: " + ManaClientCache.mana + " / " + ManaClientCache.maxMana);
-            graphics.drawString(mc.font, text, 10, 10, 0xFFFFFFFF, true);
+            }
         }
 
 
