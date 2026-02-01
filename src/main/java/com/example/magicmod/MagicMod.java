@@ -1,7 +1,9 @@
 package com.example.magicmod;
 
 import com.example.magicmod.block.register.ModBlockRegister;
+import com.example.magicmod.effect.ModEffects;
 import com.example.magicmod.item.register.ModItemRegister;
+import com.example.magicmod.potion.ModPotion;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -57,6 +59,12 @@ public final class MagicMod {
         ModBlockRegister.RegisterBlock(modBusGroup);
         // Register the Deferred Register to the mod event bus so items get registered
         ModItemRegister.RegisterItem(modBusGroup);
+
+        // Register the Deferred Register to the mod event bus so effects get registered
+        ModEffects.registerEffect(modBusGroup);
+        // Register to the mod event bus potions and recipes
+        ModPotion.registerItem(modBusGroup);
+
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modBusGroup);
 
@@ -92,6 +100,7 @@ public final class MagicMod {
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
     public static class ClientModEvents {
+        private  ClientModEvents(){}
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             // Some client setup code

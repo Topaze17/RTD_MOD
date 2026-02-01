@@ -3,5 +3,9 @@
   "item.magicmod.fire_crystal_block": "Fire Crystal",
   "block.magicmod.mana_crystal_block": "Mana Crystal",
   "block.magicmod.fire_crystal_block": "Fire Crystal",
-  "item.magicmod.mana_crystal_shard": "Mana Crystal Shard"
+  "item.magicmod.mana_crystal_shard": "Mana Crystal Shard",
+
+  "effect.magicmod.mana_regeneration" : "Mana Regeneration",
+
+  "item.minecraft.potion.effect.mana_potion": "Mana Potion"
 }
