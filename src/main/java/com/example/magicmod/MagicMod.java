@@ -2,6 +2,7 @@ package com.example.magicmod;
 
 import com.example.magicmod.capabilities.mana.ManaProvider;
 import com.example.magicmod.block.register.ModBlockRegister;
+import com.example.magicmod.effect.ManaSupercharge;
 import com.example.magicmod.effect.ModEffects;
 import com.example.magicmod.item.register.ModItemRegister;
 import com.example.magicmod.potion.ModPotion;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -123,7 +125,7 @@ public final class MagicMod {
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class ServerModEvents {
         /**
-         * things that append when the event to attach capabilities trigger (use to add our mod capabilities)
+         * things that happen when the event to attach capabilities triggers (use to add our mod capabilities)
          * */
         @SubscribeEvent
         public static void onAttachCapabilities(AttachCapabilitiesEvent event) {
@@ -134,12 +136,50 @@ public final class MagicMod {
             }
         }
         /**
-         * things that append when the login event trigger
+         * things that happen when the login event triggers
          * */
         @SubscribeEvent
         public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
             if (event.getEntity() instanceof ServerPlayer sp) {
                 Sync.syncManaTo(sp);
+            }
+        }
+
+        @SubscribeEvent
+        public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+            if (event.getEntity() instanceof ServerPlayer sp) {
+                ManaSupercharge.cleanupFor(sp.getUUID());
+            }
+        }
+
+        /**
+         * Detects when a mob effect is removed from an entity.
+         * Used to cleanup the Mana Supercharge effect properly.
+         * */
+        @SubscribeEvent
+        public static void onEffectRemoved(MobEffectEvent.Remove event) {
+            // Check if the removed effect is Mana Supercharge
+            if (event.getEffect() != null && event.getEffect().equals(ModEffects.MANA_SUPERCHARGE.getHolder().get())) {
+                LOGGER.info("Mana Supercharge effect removed for entity: {}, effect: {}",
+                    event.getEntity().getName().getString(),
+                    event.getEffect().getDescriptionId());
+                ManaSupercharge.onEffectRemoved(event.getEntity());
+            }
+        }
+
+        /**
+         * Detects when a mob effect expires naturally on an entity.
+         * Used to cleanup the Mana Supercharge effect when it runs out.
+         * */
+        @SubscribeEvent
+        public static void onEffectExpired(MobEffectEvent.Expired event) {
+            // Check if the expired effect is Mana Supercharge
+            if (event.getEffectInstance() != null &&
+                event.getEffectInstance().getEffect().equals(ModEffects.MANA_SUPERCHARGE.getHolder().get())) {
+                LOGGER.info("Mana Supercharge effect expired for entity: {}, effect: {}. Calling cleanup.",
+                    event.getEntity().getName().getString(),
+                    event.getEffectInstance().getDescriptionId());
+                ManaSupercharge.onEffectRemoved(event.getEntity());
             }
         }
     }
