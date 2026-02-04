@@ -3,7 +3,7 @@
 
 package com.example.magicmod.HudOverlay.mixin;
 
-import com.example.magicmod.capabilities.mana.IMana;
+import com.example.magicmod.capabilities.mana.CapabilityMana;
 import com.example.magicmod.capabilities.ModCapabilities;
 import com.example.magicmod.network.cache.ManaClientCache;
 import net.minecraft.client.DeltaTracker;
@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.GameType;
 import net.minecraftforge.common.util.LazyOptional;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,7 +37,7 @@ public abstract class ManaHudMixin {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         if (mc.options.hideGui) return;
-        LazyOptional<IMana> mana = mc.player.getCapability(ModCapabilities.MANA);
+        LazyOptional<CapabilityMana> mana = mc.player.getCapability(ModCapabilities.MANA);
         if (!mc.player.isCreative() && !mc.player.isSpectator()) {
             if (mana.isPresent()) {
                 mc.player.getCapability(ModCapabilities.MANA).ifPresent(m -> {

@@ -3,7 +3,7 @@ package com.example.magicmod.capabilities.mana;
 import com.example.magicmod.network.Sync;
 import net.minecraft.server.level.ServerPlayer;
 
-public class Mana implements IMana {
+public class Mana implements CapabilityMana, NetworkMana {
     private int mana;
     private int maxMana;
     public Mana() {
@@ -31,6 +31,7 @@ public class Mana implements IMana {
     @Override
     public void setMaxMana(int value) {
         maxMana = Math.max(0, value);
+        mana = Math.min(maxMana, mana);
     }
 
     @Override
@@ -45,15 +46,6 @@ public class Mana implements IMana {
         if (player.isCreative() || player.isSpectator()) return;
         setMaxMana(maxMana + value);
         Sync.syncManaTo(player);
-    }
-    @Override
-    public void addMana(int value) {
-        setMana(mana + value);
-    }
-
-    @Override
-    public void addMaxMana(int value) {
-        setMaxMana(maxMana + value);
     }
 }
 

@@ -2,6 +2,7 @@ package com.example.magicmod.network;
 
 
 import com.example.magicmod.capabilities.ModCapabilities;
+import com.example.magicmod.capabilities.mana.NetworkMana;
 import com.example.magicmod.network.packets.ManaSyncS2CPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -59,8 +60,9 @@ public final class NetworkHandler {
             if (player == null) return;
 
             player.getCapability(ModCapabilities.MANA).ifPresent(m -> {
-                m.setMaxMana(payload.maxMana());
-                m.setMana(payload.mana());
+                NetworkMana mana = (NetworkMana) m;
+                mana.setMaxMana(payload.maxMana());
+                mana.setMana(payload.mana());
             });
         });
         ctx.setPacketHandled(true);
