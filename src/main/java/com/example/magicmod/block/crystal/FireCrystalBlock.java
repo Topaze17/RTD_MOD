@@ -57,10 +57,6 @@ public class FireCrystalBlock extends CrystalBlock {
             if(entity instanceof ServerPlayer) {
                 entity.getCapability(ModCapabilities.MANA).ifPresent(m -> m.addMana((ServerPlayer) entity, -1));
             }
-            else {
-                entity.getCapability(ModCapabilities.MANA).ifPresent(m -> m.addMana(-1));
-            }
-
         }
         DamageSource damageSource = level.damageSources().inFire();
         entity.hurtServer(level.getServer().overworld(),damageSource, 1f);
