@@ -5,8 +5,8 @@ import net.minecraft.server.level.ServerPlayer;
 /**
  * Represents the Mana capability attached to a player.
  * <p>
- * This interface defines both getters/setters and helper methods
- * for modifying mana values, with optional server-side syncing.
+ * This interface defines both getters and helper methods
+ * for modifying mana values, with server-side syncing.
  * <p>
  * @author Topaze17
  */

@@ -1,5 +1,11 @@
 package com.example.magicmod.capabilities.mana;
-
+/**
+ * Represents the Mana capability but used on network operation.
+ * <p>
+ * This interface defines setters for modifying mana values
+ * <p>
+ * @author Topaze17
+ */
 public interface NetworkMana {
     /**
      * Sets the current mana value.
