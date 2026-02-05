@@ -8,6 +8,7 @@ import com.example.magicmod.item.register.ModItemRegister;
 import com.example.magicmod.potion.ModPotion;
 import com.example.magicmod.network.NetworkHandler;
 import com.example.magicmod.network.Sync;
+import static com.example.magicmod.effect.ManaSupercharge.isInRegenBlockPhase;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -146,9 +147,11 @@ public final class MagicMod {
         }
 
         @SubscribeEvent
-        public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        public static void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
             if (event.getEntity() instanceof ServerPlayer sp) {
-                ManaSupercharge.cleanupFor(sp.getUUID());
+                if (!isInRegenBlockPhase(sp)) {
+                    ManaSupercharge.cleanupFor(sp.getUUID());
+                }
             }
         }
 

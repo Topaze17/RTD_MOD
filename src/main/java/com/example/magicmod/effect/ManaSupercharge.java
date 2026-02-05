@@ -10,9 +10,9 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import org.slf4j.Logger;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Mana Supercharge effect:
@@ -24,10 +24,10 @@ public class ManaSupercharge extends MobEffect {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     // Store original max mana per player (thread-safe)
-    private static final Map<UUID, Integer> ORIGINAL_MAX_MANA = new ConcurrentHashMap<>();
+    private static final Map<UUID, Integer> ORIGINAL_MAX_MANA = new HashMap<>();
     // Track current phase per player to handle reapplication correctly
     private enum Phase { SUPERCHARGE, REGEN_BLOCK }
-    private static final Map<UUID, Phase> PHASE = new ConcurrentHashMap<>();
+    private static final Map<UUID, Phase> PHASE = new HashMap<>();
 
     // Transition point (400 ticks remaining)
     private static final int REGEN_BLOCK_DURATION = 400;
