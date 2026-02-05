@@ -6,12 +6,15 @@ import net.minecraft.server.level.ServerPlayer;
 public class Mana implements CapabilityMana, NetworkMana {
     private int mana;
     private int maxMana;
+    private boolean isInRegenBlock;
+
     public Mana() {
         this(100,100);
     }
     public Mana(int mana, int maxMana) {
         this.mana = mana;
         this.maxMana = maxMana;
+        this.isInRegenBlock = false;
     }
     @Override
     public int getMana() {
@@ -35,8 +38,23 @@ public class Mana implements CapabilityMana, NetworkMana {
     }
 
     @Override
+    public boolean isInRegenBlock() {
+        return isInRegenBlock;
+    }
+
+    @Override
+    public void setInRegenBlock(boolean value) {
+        isInRegenBlock = value;
+    }
+
+    @Override
     public void addMana(ServerPlayer player, int value) {
         if (player.isCreative() || player.isSpectator()) return;
+
+        // When in a regen-blocking state, only block positive changes (regeneration).
+        // Negative values represent mana consumption and must still be applied.
+        if (value > 0 && isInRegenBlock) return;
+
         setMana(mana + value);
         Sync.syncManaTo(player);
     }

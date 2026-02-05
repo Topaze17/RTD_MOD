@@ -20,6 +20,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ManaProvider implements ICapabilitySerializable<CompoundTag> {
 
+    private static final String MANA_KEY = "Mana";
+    private static final String MAX_MANA_KEY = "MaxMana";
+    private static final String IS_IN_REGEN_BLOCK_KEY = "IsInRegenBlock";
+
     private final Mana mana = new Mana(1000, 1000);
     private final LazyOptional<CapabilityMana> optional = LazyOptional.of(() -> mana);
 
@@ -31,15 +35,18 @@ public class ManaProvider implements ICapabilitySerializable<CompoundTag> {
     @Override
     public CompoundTag serializeNBT(HolderLookup.Provider registryAccess) {
         CompoundTag tag = new CompoundTag();
-        tag.putInt("Mana", mana.getMana());
-        tag.putInt("MaxMana", mana.getMaxMana());
+        tag.putInt(MANA_KEY, mana.getMana());
+        tag.putInt(MAX_MANA_KEY, mana.getMaxMana());
+        tag.putBoolean(IS_IN_REGEN_BLOCK_KEY, mana.isInRegenBlock());
         return tag;
     }
 
     @Override
     public void deserializeNBT(HolderLookup.Provider registryAccess, CompoundTag tag) {
-        if (tag.getInt("Mana").isPresent()) mana.setMana(tag.getInt("Mana").get());
-        if (tag.getInt("MaxMana").isPresent()) mana.setMaxMana(tag.getInt("MaxMana").get());
+        // IMPORTANT: Load MaxMana BEFORE Mana to avoid incorrect clamping
+        if (tag.getInt(MAX_MANA_KEY).isPresent()) mana.setMaxMana(tag.getInt(MAX_MANA_KEY).get());
+        if (tag.getInt(MANA_KEY).isPresent()) mana.setMana(tag.getInt(MANA_KEY).get());
+        if (tag.getBoolean(IS_IN_REGEN_BLOCK_KEY).isPresent()) mana.setInRegenBlock(tag.getBoolean(IS_IN_REGEN_BLOCK_KEY).get());
     }
 
     public void invalidate() {

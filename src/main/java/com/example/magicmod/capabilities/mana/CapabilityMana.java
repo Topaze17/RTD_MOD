@@ -22,6 +22,10 @@ public interface CapabilityMana {
      */
     int getMaxMana();
 
+    /**
+     * @return true if mana regeneration is currently blocked
+     */
+    boolean isInRegenBlock();
 
     /**
      * Adds mana to this capability and synchronizes
@@ -45,4 +49,3 @@ public interface CapabilityMana {
      */
     void addMaxMana(ServerPlayer player, int value);
 }
-

@@ -25,4 +25,11 @@ public interface NetworkMana {
      * @param value the new maximum mana
      */
     void setMaxMana(int value);
+
+    /**
+     * Sets whether mana regeneration is blocked.
+     *
+     * @param value true to block regeneration, false to allow it
+     */
+    void setInRegenBlock(boolean value);
 }

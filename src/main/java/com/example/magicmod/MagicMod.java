@@ -1,5 +1,6 @@
 package com.example.magicmod;
 
+import com.example.magicmod.capabilities.ModCapabilities;
 import com.example.magicmod.capabilities.mana.ManaProvider;
 import com.example.magicmod.block.register.ModBlockRegister;
 import com.example.magicmod.effect.ManaSupercharge;
@@ -8,7 +9,6 @@ import com.example.magicmod.item.register.ModItemRegister;
 import com.example.magicmod.potion.ModPotion;
 import com.example.magicmod.network.NetworkHandler;
 import com.example.magicmod.network.Sync;
-import static com.example.magicmod.effect.ManaSupercharge.isInRegenBlockPhase;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -142,6 +142,11 @@ public final class MagicMod {
         @SubscribeEvent
         public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
             if (event.getEntity() instanceof ServerPlayer sp) {
+                // TODO: Remove debug logger before production
+                LOGGER.info("=== Player Login === UUID: {}", sp.getUUID());
+
+
+                // Sync mana to client
                 Sync.syncManaTo(sp);
             }
         }
@@ -149,9 +154,15 @@ public final class MagicMod {
         @SubscribeEvent
         public static void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
             if (event.getEntity() instanceof ServerPlayer sp) {
-                if (!isInRegenBlockPhase(sp)) {
-                    ManaSupercharge.cleanupFor(sp.getUUID());
-                }
+                // TODO: Remove debug logger before production
+                LOGGER.info("=== Player Logout === UUID: {}", sp.getUUID());
+
+                // Cleanup only if effect is not active (check via capability)
+                sp.getCapability(ModCapabilities.MANA).ifPresent(mana -> {
+                    if (!mana.isInRegenBlock()) {
+                        ManaSupercharge.cleanupFor(sp.getUUID());
+                    }
+                });
             }
         }
 
@@ -163,9 +174,9 @@ public final class MagicMod {
         public static void onEffectRemoved(MobEffectEvent.Remove event) {
             // Check if the removed effect is Mana Supercharge
             if (event.getEffect() != null && event.getEffect().equals(ModEffects.MANA_SUPERCHARGE.getHolder().get())) {
-                LOGGER.info("Mana Supercharge effect removed for entity: {}, effect: {}",
-                    event.getEntity().getName().getString(),
-                    event.getEffect().getDescriptionId());
+                // TODO: Remove logger before production
+                LOGGER.info("Mana Supercharge effect removed for entity: {}",
+                    event.getEntity().getName().getString());
                 ManaSupercharge.onEffectRemoved(event.getEntity());
             }
         }
@@ -179,9 +190,9 @@ public final class MagicMod {
             // Check if the expired effect is Mana Supercharge
             if (event.getEffectInstance() != null &&
                 event.getEffectInstance().getEffect().equals(ModEffects.MANA_SUPERCHARGE.getHolder().get())) {
-                LOGGER.info("Mana Supercharge effect expired for entity: {}, effect: {}. Calling cleanup.",
-                    event.getEntity().getName().getString(),
-                    event.getEffectInstance().getDescriptionId());
+                // TODO: Remove logger before production
+                LOGGER.info("Mana Supercharge effect expired for entity: {}",
+                    event.getEntity().getName().getString());
                 ManaSupercharge.onEffectRemoved(event.getEntity());
             }
         }

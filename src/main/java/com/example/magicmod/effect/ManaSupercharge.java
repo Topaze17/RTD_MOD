@@ -1,7 +1,7 @@
 package com.example.magicmod.effect;
 
 import com.example.magicmod.capabilities.ModCapabilities;
-import com.example.magicmod.network.Sync;
+import com.example.magicmod.capabilities.mana.NetworkMana;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,11 +23,8 @@ import java.util.UUID;
 public class ManaSupercharge extends MobEffect {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    // Store original max mana per player (thread-safe)
+    // Store original max mana per player
     private static final Map<UUID, Integer> ORIGINAL_MAX_MANA = new HashMap<>();
-    // Track current phase per player to handle reapplication correctly
-    private enum Phase { SUPERCHARGE, REGEN_BLOCK }
-    private static final Map<UUID, Phase> PHASE = new HashMap<>();
 
     // Transition point (400 ticks remaining)
     private static final int REGEN_BLOCK_DURATION = 400;
@@ -42,33 +39,34 @@ public class ManaSupercharge extends MobEffect {
     }
 
     /**
-     * Apply effect: store original max mana and double it.
-     * Reapplication while effect active (any phase) will not grant extra current mana.
+     * Apply effect: store original max mana, double it, and block regeneration.
      */
     @Override
     public void onEffectStarted(LivingEntity pLivingEntity, int pAmplifier) {
         if (pLivingEntity instanceof ServerPlayer player) {
+            // TODO: Remove logger before production
             LOGGER.info("ManaSupercharge started for player: {}", player.getName().getString());
+
             player.getCapability(ModCapabilities.MANA).ifPresent(mana -> {
                 UUID uid = player.getUUID();
 
-                // Atomically mark the player as in SUPERCHARGE phase if not already present.
-                // If putIfAbsent returns non-null, a phase was already tracked -> reapplication.
-                Phase previous = PHASE.putIfAbsent(uid, Phase.SUPERCHARGE);
-                if (previous != null) {
-                    LOGGER.info("Reapplication detected for {} - resetting duration only", player.getName().getString());
+                // Check if already applied (reapplication case)
+                if (ORIGINAL_MAX_MANA.containsKey(uid)) {
                     return;
                 }
 
-                // First application: record original and apply supercharge
-                int currentMaxMana = mana.getMaxMana();
-                ORIGINAL_MAX_MANA.put(uid, currentMaxMana);
+                // First application: record original max mana
+                int originalMaxMana = mana.getMaxMana();
+                ORIGINAL_MAX_MANA.put(uid, originalMaxMana);
 
-                // Double max mana and grant extra current mana
-                mana.addMaxMana(player, currentMaxMana);
-                mana.addMana(player, currentMaxMana);
+                // Double max mana and grant extra current mana (first so isn't block)
+                mana.addMaxMana(player, originalMaxMana);
+                mana.addMana(player, originalMaxMana);
 
-                LOGGER.info("First application: new max mana: {}, current mana: {}", mana.getMaxMana(), mana.getMana());
+                // Block mana regeneration for the entire duration
+                if (mana instanceof NetworkMana netMana) {
+                    netMana.setInRegenBlock(true);
+                }
             });
         }
     }
@@ -80,25 +78,25 @@ public class ManaSupercharge extends MobEffect {
     public boolean applyEffectTick(ServerLevel pServerLevel, LivingEntity pLivingEntity, int pAmplifier) {
         if (pLivingEntity instanceof ServerPlayer player) {
             player.getCapability(ModCapabilities.MANA).ifPresent(mana -> {
-                // Atomically restore & remove the stored original if present (safe if this method runs multiple times)
-                ORIGINAL_MAX_MANA.computeIfPresent(player.getUUID(), (uuid, originalMaxMana) -> {
-                    // switch phase to regen-block before restoration
-                    PHASE.put(player.getUUID(), Phase.REGEN_BLOCK);
+                Integer originalMaxMana = ORIGINAL_MAX_MANA.get(player.getUUID());
+                if (originalMaxMana == null) return;
 
-                    mana.setMaxMana(originalMaxMana);
-                    if (mana.getMana() > originalMaxMana) {
-                        mana.setMana(originalMaxMana);
-                    }
-                    Sync.syncManaTo(player);
-                    LOGGER.info("Transition restore: max mana set to {} for {}", originalMaxMana, player.getName().getString());
+                // Calculate and remove the bonus
+                int currentMaxMana = mana.getMaxMana();
+                int bonus = currentMaxMana - originalMaxMana;
+                mana.addMaxMana(player, -bonus);
 
-                    // return null to remove the entry from the map
-                    return null;
-                });
-             });
-         }
-         return true;
-     }
+                // Clamp current mana if it exceeds the restored max
+                if (mana.getMana() > originalMaxMana) {
+                    int excessMana = mana.getMana() - originalMaxMana;
+                    mana.addMana(player, -excessMana);
+                }
+
+                // Note: isInRegenBlock stays true - we still block regen in phase 2
+            });
+        }
+        return true;
+    }
 
     /**
      * Called when the effect is removed from an entity.
@@ -106,24 +104,33 @@ public class ManaSupercharge extends MobEffect {
      */
     public static void onEffectRemoved(LivingEntity pLivingEntity) {
         if (pLivingEntity instanceof ServerPlayer player) {
+            // TODO: Remove logger before production
             LOGGER.info("ManaSupercharge removed for player: {}", player.getName().getString());
-            // As a safe fallback, atomically restore & remove if still present
-            ORIGINAL_MAX_MANA.computeIfPresent(player.getUUID(), (uuid, originalMaxMana) -> {
-                player.getCapability(ModCapabilities.MANA).ifPresent(mana -> {
-                    mana.setMaxMana(originalMaxMana);
-                    if (mana.getMana() > originalMaxMana) {
-                        mana.setMana(originalMaxMana);
-                    }
-                    // Sync the changes to the client
-                    Sync.syncManaTo(player);
-                    LOGGER.info("Fallback restore on removal: max mana set to {} for {}", originalMaxMana, player.getName().getString());
-                });
-                // return null to remove the entry from the map
-                return null;
-            });
 
-            // Clean up phase tracking
-            PHASE.remove(player.getUUID());
+            player.getCapability(ModCapabilities.MANA).ifPresent(mana -> {
+                Integer originalMaxMana = ORIGINAL_MAX_MANA.remove(player.getUUID());
+                if (originalMaxMana == null) return;
+
+                // Re-enable mana regeneration
+                if (mana instanceof NetworkMana netMana) {
+                    netMana.setInRegenBlock(false);
+                } else {
+                    LOGGER.warn("Mana capability for player {} is not NetworkMana; cannot clear regen block.", player.getName().getString());
+                }
+
+                // Restore original max mana if still doubled
+                int currentMaxMana = mana.getMaxMana();
+                int bonus = currentMaxMana - originalMaxMana;
+                if (bonus > 0) {
+                    mana.addMaxMana(player, -bonus);
+
+                    // Clamp current mana if needed
+                    if (mana.getMana() > originalMaxMana) {
+                        int excessMana = mana.getMana() - originalMaxMana;
+                        mana.addMana(player, -excessMana);
+                    }
+                }
+            });
         }
     }
 
@@ -132,7 +139,6 @@ public class ManaSupercharge extends MobEffect {
      */
     public static void cleanupFor(UUID playerUuid) {
         ORIGINAL_MAX_MANA.remove(playerUuid);
-        PHASE.remove(playerUuid);
     }
 
     /**
@@ -143,13 +149,5 @@ public class ManaSupercharge extends MobEffect {
     @Override
     public boolean shouldApplyEffectTickThisTick(int pDuration, int pAmplifier) {
         return pDuration == REGEN_BLOCK_DURATION;
-    }
-
-    /**
-     * Return true while effect active to block mana regeneration.
-     */
-    public static boolean isInRegenBlockPhase(ServerPlayer player) {
-        var effect = player.getEffect(ModEffects.MANA_SUPERCHARGE.getHolder().get());
-        return effect != null;
     }
 }

@@ -28,7 +28,7 @@ public class ManaRegeneration extends MobEffect {
     /**
      * Applies the effect's tick behavior.
      * Grants 1 mana point to the player each time this method is called.
-     * Will not regenerate mana if the player is in the ManaSupercharge regen block phase.
+     * Any blocking of mana regeneration (such as regen block phases) is handled internally by the Mana capability.
      *
      * @param pServerLevel The server level where the effect is being applied
      * @param pLivingEntity The living entity affected by this effect
@@ -39,11 +39,6 @@ public class ManaRegeneration extends MobEffect {
     public boolean applyEffectTick(ServerLevel pServerLevel, LivingEntity pLivingEntity, int pAmplifier) {
 
         if (pLivingEntity instanceof ServerPlayer player) {
-            // Check if player is in ManaSupercharge regen block phase
-            if (ManaSupercharge.isInRegenBlockPhase(player)) {
-                return true; // Don't regenerate mana during block phase
-            }
-
             player.getCapability(ModCapabilities.MANA).ifPresent(m -> m.addMana( player, 1));
         }
 
