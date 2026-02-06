@@ -51,8 +51,6 @@ public class Mana implements CapabilityMana, NetworkMana {
     public void addMana(ServerPlayer player, int value) {
         if (player.isCreative() || player.isSpectator()) return;
 
-        // When in a regen-blocking state, only block positive changes (regeneration).
-        // Negative values represent mana consumption and must still be applied.
         if (value > 0 && isInRegenBlock) return;
 
         setMana(mana + value);
