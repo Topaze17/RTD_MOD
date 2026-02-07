@@ -1,7 +1,7 @@
 package com.example.magicmod.capabilities;
 
 
-import com.example.magicmod.capabilities.mana.IMana;
+import com.example.magicmod.capabilities.mana.CapabilityMana;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -12,7 +12,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
  * @author Topaze17
  */
 public class ModCapabilities {
-    public static final Capability<IMana> MANA =
+    public static final Capability<CapabilityMana> MANA =
             CapabilityManager.get(new CapabilityToken<>() {});
 }
 

@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public class ManaProvider implements ICapabilitySerializable<CompoundTag> {
 
     private final Mana mana = new Mana(1000, 1000);
-    private final LazyOptional<IMana> optional = LazyOptional.of(() -> mana);
+    private final LazyOptional<CapabilityMana> optional = LazyOptional.of(() -> mana);
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
