@@ -44,7 +44,26 @@ public class ManaSupercharge extends MobEffect {
             LOGGER.info("ManaSupercharge.onEffectStarted for player: {}", player.getName().getString());
 
             player.getCapability(ModCapabilities.MANA).ifPresent(mana -> {
-                // Check if modifier already exists (reconnection case)
+                // Read base mana first
+                int baseMana = mana.getMaxManaModifier(com.example.magicmod.capabilities.mana.Mana.BASE_KEY);
+
+                // If player is in regen-block but the modifier is missing, we are in phase 2.
+                // Do NOT reapply the modifier (would increase maxMana without granting current mana).
+                if (mana.isInRegenBlock() && !mana.hasMaxManaModifier(MODIFIER_ID)) {
+                    LOGGER.info("ManaSupercharge.onEffectStarted - In regen-block phase and modifier absent, skipping reapplication");
+                    return;
+                }
+
+                // If current total max mana is different than the base, avoid applying the modifier
+                // This prevents overwriting a client-side maxMana display when reconnecting or in edge cases
+                if (!mana.hasMaxManaModifier(MODIFIER_ID) && mana.getMaxMana() != baseMana) {
+                    LOGGER.info("ManaSupercharge.onEffectStarted - Current max ({}) differs from base ({}), skipping modifier application to avoid display inconsistencies", mana.getMaxMana(), baseMana);
+                    // Ensure regen block if needed and exit
+                    if (mana.isInRegenBlock()) mana.setInRegenBlock(true);
+                    return;
+                }
+
+                // Check if modifier already exists (reconnection or already active)
                 if (mana.hasMaxManaModifier(MODIFIER_ID)) {
                     LOGGER.info("ManaSupercharge modifier already active, skipping reapplication");
                     // Ensure regen block is set
@@ -52,18 +71,13 @@ public class ManaSupercharge extends MobEffect {
                     return;
                 }
 
-                int baseMana = mana.getMaxManaModifier(com.example.magicmod.capabilities.mana.Mana.BASE_KEY);
-
                 // TODO: Remove logger before production
                 LOGGER.info("ManaSupercharge.onEffectStarted - BaseMana: {}, CurrentMaxMana: {}",
                     baseMana, mana.getMaxMana());
 
-                // Add modifier: double the base mana
-                int bonus = baseMana;
-                mana.addMaxManaModifier(player, MODIFIER_ID, bonus);
-
-                // Grant bonus mana immediately
-                mana.addMana(player, bonus);
+                // Add modifier: double the base mana and grant the bonus
+                mana.addMaxManaModifier(player, MODIFIER_ID, baseMana);
+                mana.addMana(player, baseMana);
 
                 // Block mana regeneration for the entire duration
                 mana.setInRegenBlock(true);
