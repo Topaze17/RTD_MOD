@@ -28,7 +28,6 @@ public class ManaRegeneration extends MobEffect {
     /**
      * Applies the effect's tick behavior.
      * Grants 1 mana point to the player each time this method is called.
-     * Any blocking of mana regeneration (such as regen block phases) is handled internally by the Mana capability.
      *
      * @param pServerLevel The server level where the effect is being applied
      * @param pLivingEntity The living entity affected by this effect

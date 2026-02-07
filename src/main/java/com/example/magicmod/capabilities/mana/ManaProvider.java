@@ -43,7 +43,6 @@ public class ManaProvider implements ICapabilitySerializable<CompoundTag> {
 
     @Override
     public void deserializeNBT(HolderLookup.Provider registryAccess, CompoundTag tag) {
-        // IMPORTANT: Load MaxMana BEFORE Mana to avoid incorrect clamping
         if (tag.getInt(MAX_MANA_KEY).isPresent()) mana.setMaxMana(tag.getInt(MAX_MANA_KEY).get());
         if (tag.getInt(MANA_KEY).isPresent()) mana.setMana(tag.getInt(MANA_KEY).get());
         if (tag.getBoolean(IS_IN_REGEN_BLOCK_KEY).isPresent()) mana.setInRegenBlock(tag.getBoolean(IS_IN_REGEN_BLOCK_KEY).get());
