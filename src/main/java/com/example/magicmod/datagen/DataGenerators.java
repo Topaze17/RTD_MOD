@@ -10,6 +10,12 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Class to generate json when running [gradle runData] <br>
+ * Note: DO NOT FORGET TO RERUN [gradle runData] IF YOU MAKE ANY CHANGE TO WORLD GENERATION
+ * <p>
+ * @author Topaze17
+ */
 @Mod.EventBusSubscriber(modid = MagicMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DataGenerators {
     @SubscribeEvent
@@ -17,6 +23,6 @@ public class DataGenerators {
         DataGenerator generator = event.getGenerator();
         PackOutput packOutput = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-        generator.addProvider(event.includeServer(), new ModDatapackEntries(packOutput, lookupProvider));
+        generator.addProvider(event.includeServer(), new ModWorldGenEntries(packOutput, lookupProvider));
     }
 }

@@ -12,7 +12,11 @@ import net.minecraft.world.level.levelgen.feature.configurations.BlockPileConfig
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
-
+/**
+ * class specifying how to place new block in our mod world gen.
+ * <p>
+ * @author Topaze17
+ */
 public class ModConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?,?>> OVERWORLD_MANA_CRYSTAL_KEY = registerKey("mana_crystal_block");
     public static final ResourceKey<ConfiguredFeature<?,?>> OVERWORLD_FIRE_CRYSTAL_KEY = registerKey("fire_crystal_block");

@@ -12,6 +12,11 @@ import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.common.world.ForgeBiomeModifiers;
 import net.minecraftforge.registries.ForgeRegistries;
 
+/**
+ * class specifying where to place new block in our mod world gen.
+ * <p>
+ * @author Topaze17
+ */
 public class ModBiomeModifiers {
 
     public static final ResourceKey<BiomeModifier> ADD_MANA_CRYSTAL =

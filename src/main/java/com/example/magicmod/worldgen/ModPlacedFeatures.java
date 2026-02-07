@@ -16,7 +16,11 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.*;
 
 import java.util.List;
-
+/**
+ * class specifying predicate to place new block in our mod world gen.
+ * <p>
+ * @author Topaze17
+ */
 public class ModPlacedFeatures {
     public static final ResourceKey<PlacedFeature> MANA_CRYSTAL_PLACED =
             registerKey("mana_crystal_block_placed");
@@ -29,23 +33,20 @@ public class ModPlacedFeatures {
                 MANA_CRYSTAL_PLACED,
                 configuredFeatures.getOrThrow(ModConfiguredFeatures.OVERWORLD_MANA_CRYSTAL_KEY),
                 List.of(
-                        RarityFilter.onAverageOnceEvery(4),
-                        CountPlacement.of(20),
+                        RarityFilter.onAverageOnceEvery(5),
+                        CountPlacement.of(3),
                         InSquarePlacement.spread(),
                         HeightRangePlacement.uniform(
                                 VerticalAnchor.absolute(-64),
                                 VerticalAnchor.absolute(30)
                         ),
 
-                        // only place if target block is air
                         BlockPredicateFilter.forPredicate(
                                 BlockPredicate.matchesBlocks(
                                         BlockPos.ZERO,
                                         Blocks.AIR
                                 )
                         ),
-
-                        // only place if block below is stone
                         BlockPredicateFilter.forPredicate(
                                 BlockPredicate.hasSturdyFace(
                                         new BlockPos(0, -1, 0),

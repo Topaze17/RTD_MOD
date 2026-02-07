@@ -17,8 +17,12 @@ import net.minecraftforge.common.world.BiomeModifier;
 
 import java.util.concurrent.CompletableFuture;
 
-
-public class ModDatapackEntries extends DatapackBuiltinEntriesProvider {
+/**
+ * Class to specifying the folder structure and json maker for the world gen json.
+ * <p>
+ * @author Topaze17
+ */
+public class ModWorldGenEntries extends DatapackBuiltinEntriesProvider {
     public static final ResourceKey<Registry<BiomeModifier>> BIOME_MODIFIERS_KEY = ResourceKey.createRegistryKey(
             Identifier.fromNamespaceAndPath("forge", "biome_modifier")
     );
@@ -27,7 +31,7 @@ public class ModDatapackEntries extends DatapackBuiltinEntriesProvider {
             .add(Registries.PLACED_FEATURE, ModPlacedFeatures::bootstrap)
             .add(BIOME_MODIFIERS_KEY, ModBiomeModifiers::bootstrap);
 
-    public ModDatapackEntries(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+    public ModWorldGenEntries(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries, BUILDER, MagicMod.MODID);
     }
 }
