@@ -1,7 +1,6 @@
 package com.example.magicmod.effect;
 
 import com.example.magicmod.capabilities.ModCapabilities;
-import com.example.magicmod.capabilities.mana.NetworkMana;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -64,9 +63,7 @@ public class ManaSupercharge extends MobEffect {
                 mana.addMana(player, originalMaxMana);
 
                 // Block mana regeneration for the entire duration
-                if (mana instanceof NetworkMana netMana) {
-                    netMana.setInRegenBlock(true);
-                }
+                mana.setInRegenBlock(true);
             });
         }
     }
@@ -112,11 +109,7 @@ public class ManaSupercharge extends MobEffect {
                 if (originalMaxMana == null) return;
 
                 // Re-enable mana regeneration
-                if (mana instanceof NetworkMana netMana) {
-                    netMana.setInRegenBlock(false);
-                } else {
-                    LOGGER.warn("Mana capability for player {} is not NetworkMana; cannot clear regen block.", player.getName().getString());
-                }
+                mana.setInRegenBlock(false);
 
                 // Restore original max mana if still doubled
                 int currentMaxMana = mana.getMaxMana();
