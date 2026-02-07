@@ -5,23 +5,12 @@ import net.minecraft.server.level.ServerPlayer;
 /**
  * Represents the Mana capability attached to a player.
  * <p>
- * This interface defines both getters and helper methods
- * for modifying mana values, with server-side syncing.
+ * This interface defines helper methods for modifying mana values
+ * with server-side syncing. It extends ManaData for core data access.
  * <p>
  * @author Topaze17
  */
-public interface CapabilityMana {
-
-    /**
-     * @return the current mana value
-     */
-    int getMana();
-
-    /**
-     * @return the maximum mana value
-     */
-    int getMaxMana();
-
+public interface CapabilityMana extends ManaData {
 
     /**
      * Adds mana to this capability and synchronizes
@@ -45,4 +34,3 @@ public interface CapabilityMana {
      */
     void addMaxMana(ServerPlayer player, int value);
 }
-
