@@ -157,12 +157,6 @@ public final class MagicMod {
                 // TODO: Remove debug logger before production
                 LOGGER.info("=== Player Logout === UUID: {}", sp.getUUID());
 
-                // Cleanup only if effect is not active (check via capability)
-                sp.getCapability(ModCapabilities.MANA).ifPresent(mana -> {
-                    if (!mana.isInRegenBlock()) {
-                        ManaSupercharge.cleanupFor(sp.getUUID());
-                    }
-                });
             }
         }
 

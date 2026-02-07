@@ -19,6 +19,22 @@ public interface ManaData {
     int getMaxMana();
 
     /**
+     * Get the value of a specific max mana modifier.
+     *
+     * @param sourceId unique identifier for the modifier
+     * @return the modifier value, or 0 if not present
+     */
+    int getMaxManaModifier(String sourceId);
+
+    /**
+     * Check if a specific modifier is active.
+     *
+     * @param sourceId unique identifier for the modifier
+     * @return true if the modifier exists and is non-zero
+     */
+    boolean hasMaxManaModifier(String sourceId);
+
+    /**
      * @return true if mana regeneration is currently blocked
      */
     boolean isInRegenBlock();
