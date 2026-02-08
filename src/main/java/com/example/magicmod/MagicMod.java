@@ -73,7 +73,7 @@ public final class MagicMod {
 
         // Register the Deferred Register to the mod event bus so effects get registered
         ModEffects.registerEffect(modBusGroup);
-        // Register to the mod event bus potions and recipes
+        // Register to the mod event bus potions.
         ModPotion.registerPotion(modBusGroup);
 
         // Register the Deferred Register to the mod event bus so tabs get registered
@@ -145,8 +145,6 @@ public final class MagicMod {
                 // TODO: Remove debug logger before production
                 LOGGER.info("=== Player Login === UUID: {}", sp.getUUID());
 
-
-                // Sync mana to client
                 Sync.syncManaTo(sp);
             }
         }
@@ -166,7 +164,6 @@ public final class MagicMod {
          * */
         @SubscribeEvent
         public static void onEffectRemoved(MobEffectEvent.Remove event) {
-            // Check if the removed effect is Mana Supercharge
             if (event.getEffect() != null && event.getEffect().equals(ModEffects.MANA_SUPERCHARGE.getHolder().get())) {
                 // TODO: Remove logger before production
                 LOGGER.info("Mana Supercharge effect removed for entity: {}",
@@ -181,7 +178,6 @@ public final class MagicMod {
          * */
         @SubscribeEvent
         public static void onEffectExpired(MobEffectEvent.Expired event) {
-            // Check if the expired effect is Mana Supercharge
             if (event.getEffectInstance() != null &&
                 event.getEffectInstance().getEffect().equals(ModEffects.MANA_SUPERCHARGE.getHolder().get())) {
                 // TODO: Remove logger before production
