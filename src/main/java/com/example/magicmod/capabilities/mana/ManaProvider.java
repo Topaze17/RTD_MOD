@@ -41,7 +41,6 @@ public class ManaProvider implements ICapabilitySerializable<CompoundTag> {
         tag.putInt(MANA_KEY, mana.getMana());
         tag.putBoolean(IS_IN_REGEN_BLOCK_KEY, mana.isInRegenBlock());
 
-        // Serialize the maxMana modifiers HashMap
         CompoundTag modifiersTag = new CompoundTag();
         for (Map.Entry<String, Integer> entry : mana.getMaxManaModifiers().entrySet()) {
             modifiersTag.putInt(entry.getKey(), entry.getValue());
@@ -53,12 +52,10 @@ public class ManaProvider implements ICapabilitySerializable<CompoundTag> {
 
     @Override
     public void deserializeNBT(HolderLookup.Provider registryAccess, CompoundTag tag) {
-        // Load max mana modifiers HashMap
         if (tag.contains(MAX_MANA_MODIFIERS_KEY)) {
             tag.getCompound(MAX_MANA_MODIFIERS_KEY).ifPresent(modifiersTag -> {
                 Map<String, Integer> modifiers = new HashMap<>();
 
-                // Iterate through all keys in the CompoundTag
                 for (String key : modifiersTag.keySet()) {
                     modifiersTag.getInt(key).ifPresent(value -> modifiers.put(key, value));
                 }
@@ -69,10 +66,8 @@ public class ManaProvider implements ICapabilitySerializable<CompoundTag> {
             });
         }
 
-        // Load current mana (after maxMana to avoid incorrect clamping)
         tag.getInt(MANA_KEY).ifPresent(mana::setMana);
 
-        // Load regen block state
         tag.getBoolean(IS_IN_REGEN_BLOCK_KEY).ifPresent(mana::setInRegenBlock);
     }
 
