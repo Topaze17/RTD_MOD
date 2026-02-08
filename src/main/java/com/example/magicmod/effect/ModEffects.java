@@ -30,6 +30,16 @@ public class ModEffects {
             () -> new ManaRegeneration(MobEffectCategory.NEUTRAL, 0x36ebab));
 
     /**
+     * Mana Supercharge effect.
+     * A beneficial effect that doubles max mana and blocks mana regeneration for 400 ticks (20 seconds),
+     * then continues to block mana regeneration for an additional 400 ticks (20 seconds).
+     * Total duration: 800 ticks (40 seconds).
+     * Color: 0xFFD700 (gold)
+     */
+    public static final RegistryObject<MobEffect> MANA_SUPERCHARGE = MOB_EFFECTS.register("mana_supercharge",
+            () -> new ManaSupercharge(MobEffectCategory.BENEFICIAL, 0xFFD700));
+
+    /**
      * Registers all mob effects to the mod event bus.
      * This method should be called during mod initialization.
      *

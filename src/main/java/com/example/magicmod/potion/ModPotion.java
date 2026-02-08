@@ -31,6 +31,15 @@ public class ModPotion {
             () -> new Potion( "mana_potion",new MobEffectInstance(ModEffects.MANA_REGENERATION.getHolder().get(), 200, 0)));
 
     /**
+     * Mana Supercharge Potion.
+     * Applies the Mana Supercharge effect for 800 ticks (40 seconds).
+     * - First 20 seconds: Doubles max mana and blocks mana regeneration
+     * - Last 20 seconds: Restores max mana and continues to block regeneration
+     */
+    public static final RegistryObject<Potion> MANA_SUPERCHARGE_POTION = POTIONS.register("mana_supercharge_potion",
+            () -> new Potion("mana_supercharge_potion", new MobEffectInstance(ModEffects.MANA_SUPERCHARGE.getHolder().get(), 800, 0)));
+
+    /**
      * Registers all potions to the mod event bus.
      * This method should be called during mod initialization.
      *

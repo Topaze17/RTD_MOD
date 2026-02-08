@@ -6,6 +6,8 @@
   "item.magicmod.mana_crystal_shard": "Mana Crystal Shard",
 
   "effect.magicmod.mana_regeneration" : "Mana Regeneration",
+  "effect.magicmod.mana_supercharge" : "Mana Supercharge",
 
-  "item.minecraft.potion.effect.mana_potion": "Mana Potion"
+  "item.minecraft.potion.effect.mana_potion": "Mana Potion",
+  "item.minecraft.potion.effect.mana_supercharge_potion": "Mana Supercharge Potion"
 }
