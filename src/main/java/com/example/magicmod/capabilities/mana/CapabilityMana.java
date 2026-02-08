@@ -6,7 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
  * Represents the Mana capability attached to a player.
  * <p>
  * This interface defines helper methods for modifying mana values
- * with server-side syncing. It extends ManaData for core data access.
+ * with server-side syncing. It extends ManaData for exposing the necessary for gameplay implementation.
  * <p>
  * @author Topaze17
  */
