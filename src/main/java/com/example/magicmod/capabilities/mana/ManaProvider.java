@@ -10,8 +10,11 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-/**
 
+import java.util.HashMap;
+import java.util.Map;
+
+/**
  * <p>
  * Class implementing {@link ICapabilitySerializable} in order to provide
  * a {@link #serializeNBT} and {@link #deserializeNBT} for our capability mana and the {@link #getCapability(Capability, Direction)}
@@ -19,6 +22,10 @@ import org.jetbrains.annotations.Nullable;
  * @author Topaze17
  */
 public class ManaProvider implements ICapabilitySerializable<CompoundTag> {
+
+    private static final String MANA_KEY = "Mana";
+    private static final String MAX_MANA_MODIFIERS_KEY = "MaxManaModifiers";
+    private static final String IS_IN_REGEN_BLOCK_KEY = "IsInRegenBlock";
 
     private final Mana mana = new Mana(1000, 1000);
     private final LazyOptional<CapabilityMana> optional = LazyOptional.of(() -> mana);
@@ -31,15 +38,37 @@ public class ManaProvider implements ICapabilitySerializable<CompoundTag> {
     @Override
     public CompoundTag serializeNBT(HolderLookup.Provider registryAccess) {
         CompoundTag tag = new CompoundTag();
-        tag.putInt("Mana", mana.getMana());
-        tag.putInt("MaxMana", mana.getMaxMana());
+        tag.putInt(MANA_KEY, mana.getMana());
+        tag.putBoolean(IS_IN_REGEN_BLOCK_KEY, mana.isInRegenBlock());
+
+        CompoundTag modifiersTag = new CompoundTag();
+        for (Map.Entry<String, Integer> entry : mana.getMaxManaModifiers().entrySet()) {
+            modifiersTag.putInt(entry.getKey(), entry.getValue());
+        }
+        tag.put(MAX_MANA_MODIFIERS_KEY, modifiersTag);
+
         return tag;
     }
 
     @Override
     public void deserializeNBT(HolderLookup.Provider registryAccess, CompoundTag tag) {
-        if (tag.getInt("Mana").isPresent()) mana.setMana(tag.getInt("Mana").get());
-        if (tag.getInt("MaxMana").isPresent()) mana.setMaxMana(tag.getInt("MaxMana").get());
+        if (tag.contains(MAX_MANA_MODIFIERS_KEY)) {
+            tag.getCompound(MAX_MANA_MODIFIERS_KEY).ifPresent(modifiersTag -> {
+                Map<String, Integer> modifiers = new HashMap<>();
+
+                for (String key : modifiersTag.keySet()) {
+                    modifiersTag.getInt(key).ifPresent(value -> modifiers.put(key, value));
+                }
+
+                if (!modifiers.isEmpty()) {
+                    mana.setMaxManaModifiers(modifiers);
+                }
+            });
+        }
+
+        tag.getInt(MANA_KEY).ifPresent(mana::setMana);
+
+        tag.getBoolean(IS_IN_REGEN_BLOCK_KEY).ifPresent(mana::setInRegenBlock);
     }
 
     public void invalidate() {

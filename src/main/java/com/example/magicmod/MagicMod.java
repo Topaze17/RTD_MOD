@@ -1,7 +1,9 @@
 package com.example.magicmod;
 
+import com.example.magicmod.capabilities.ModCapabilities;
 import com.example.magicmod.capabilities.mana.ManaProvider;
 import com.example.magicmod.block.register.ModBlockRegister;
+import com.example.magicmod.effect.ManaSupercharge;
 import com.example.magicmod.effect.ModEffects;
 import com.example.magicmod.item.register.ModItemRegister;
 import com.example.magicmod.potion.ModPotion;
@@ -19,6 +21,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -70,7 +73,7 @@ public final class MagicMod {
 
         // Register the Deferred Register to the mod event bus so effects get registered
         ModEffects.registerEffect(modBusGroup);
-        // Register to the mod event bus potions and recipes
+        // Register to the mod event bus potions.
         ModPotion.registerPotion(modBusGroup);
 
         // Register the Deferred Register to the mod event bus so tabs get registered
@@ -123,7 +126,7 @@ public final class MagicMod {
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class ServerModEvents {
         /**
-         * things that append when the event to attach capabilities trigger (use to add our mod capabilities)
+         * things that happen when the event to attach capabilities triggers (use to add our mod capabilities)
          * */
         @SubscribeEvent
         public static void onAttachCapabilities(AttachCapabilitiesEvent event) {
@@ -134,12 +137,53 @@ public final class MagicMod {
             }
         }
         /**
-         * things that append when the login event trigger
+         * things that happen when the login event triggers
          * */
         @SubscribeEvent
         public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
             if (event.getEntity() instanceof ServerPlayer sp) {
+                // TODO: Remove debug logger before production
+                LOGGER.info("=== Player Login === UUID: {}", sp.getUUID());
+
                 Sync.syncManaTo(sp);
+            }
+        }
+
+        @SubscribeEvent
+        public static void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+            if (event.getEntity() instanceof ServerPlayer sp) {
+                // TODO: Remove debug logger before production
+                LOGGER.info("=== Player Logout === UUID: {}", sp.getUUID());
+
+            }
+        }
+
+        /**
+         * Detects when a mob effect is removed from an entity.
+         * Used to cleanup the Mana Supercharge effect properly.
+         * */
+        @SubscribeEvent
+        public static void onEffectRemoved(MobEffectEvent.Remove event) {
+            if (event.getEffect() != null && event.getEffect().equals(ModEffects.MANA_SUPERCHARGE.getHolder().get())) {
+                // TODO: Remove logger before production
+                LOGGER.info("Mana Supercharge effect removed for entity: {}",
+                    event.getEntity().getName().getString());
+                ManaSupercharge.onEffectRemoved(event.getEntity());
+            }
+        }
+
+        /**
+         * Detects when a mob effect expires naturally on an entity.
+         * Used to cleanup the Mana Supercharge effect when it runs out.
+         * */
+        @SubscribeEvent
+        public static void onEffectExpired(MobEffectEvent.Expired event) {
+            if (event.getEffectInstance() != null &&
+                event.getEffectInstance().getEffect().equals(ModEffects.MANA_SUPERCHARGE.getHolder().get())) {
+                // TODO: Remove logger before production
+                LOGGER.info("Mana Supercharge effect expired for entity: {}",
+                    event.getEntity().getName().getString());
+                ManaSupercharge.onEffectRemoved(event.getEntity());
             }
         }
     }
