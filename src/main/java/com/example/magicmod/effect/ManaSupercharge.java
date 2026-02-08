@@ -1,7 +1,6 @@
 package com.example.magicmod.effect;
 
 import com.example.magicmod.capabilities.ModCapabilities;
-import com.example.magicmod.capabilities.mana.Mana;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,6 +8,8 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import org.slf4j.Logger;
+
+import static com.example.magicmod.capabilities.mana.Mana.BASE_KEY;
 
 /**
  * Mana Supercharge effect:
