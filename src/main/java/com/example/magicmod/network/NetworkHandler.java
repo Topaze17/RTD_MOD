@@ -3,14 +3,22 @@ package com.example.magicmod.network;
 
 import com.example.magicmod.capabilities.ModCapabilities;
 import com.example.magicmod.capabilities.mana.NetworkMana;
+import com.example.magicmod.network.packets.MagicCastingC2SPacket;
 import com.example.magicmod.network.packets.ManaSyncS2CPacket;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.network.ChannelBuilder;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.SimpleChannel;
+import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * Classic Class for netword handling
@@ -42,6 +50,16 @@ public final class NetworkHandler {
                 .decoder(ManaSyncS2CPacket::decode)
                 .consumerMainThread(NetworkHandler::handleManaSync)
                 .add();
+
+        INSTANCE.messageBuilder(MagicCastingC2SPacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(MagicCastingC2SPacket::encode)
+                .decoder(MagicCastingC2SPacket::decode)
+                .consumerMainThread(NetworkHandler::handleMagicCasting)
+                .add();
+    }
+
+    public static void sendMagicCastToServer(MagicCastingC2SPacket packet) {
+        INSTANCE.send(packet, PacketDistributor.SERVER.noArg());
     }
 
     /** A function to send mana specifically to something in this case the player */
@@ -66,5 +84,40 @@ public final class NetworkHandler {
             });
         });
         ctx.setPacketHandled(true);
+    }
+
+    private static void handleMagicCasting(MagicCastingC2SPacket payload, CustomPayloadEvent.Context ctx) {
+        ctx.enqueueWork(() -> {
+            ServerPlayer player = ctx.getSender();
+            if (player == null) return;
+
+            ServerLevel level = player.level();
+
+            // for now simply spawn a ghast fireball in front of the player
+            EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(Identifier.fromNamespaceAndPath("minecraft", "fireball"));
+
+            /*List<Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>>> entities =
+                    ForgeRegistries.ENTITY_TYPES.getEntries()
+                        .stream()
+                        .filter(e -> e.getValue().getBaseClass().isAssignableFrom(LivingEntity.class))
+                        .toList();
+
+            for (var e : entities) {
+                System.out.println("\n" + e);
+            }*/
+            if (entity == null) return;
+
+            Vec3 playerEyePos = player.getEyePosition();
+            BlockPos entityPos = new BlockPos((int) playerEyePos.x, (int) playerEyePos.y, (int) playerEyePos.z);
+                    /*.relative(player.getDirection())
+                    .offset(player.getDirection().getUnitVec3i());*/
+
+            entity.spawn(level, entityPos, EntitySpawnReason.MOB_SUMMONED);
+
+
+            //EntityType<?> type = new LargeFireball(level, player, player.getEyePosition(), 1);
+
+
+        });
     }
 }

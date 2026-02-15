@@ -7,5 +7,10 @@
 
   "effect.magicmod.mana_regeneration" : "Mana Regeneration",
 
-  "item.minecraft.potion.effect.mana_potion": "Mana Potion"
+  "item.minecraft.potion.effect.mana_potion": "Mana Potion",
+
+  "key.magicmod.magic_casting_key": "Magic casting key",
+  "key.magicmod.magic_packet_key": "Magic packet",
+  "key.category.magicmod.magic_casting_key": "Magic mod keys",
+  "message.magicmod.magic_casting_key": "Magic casting key was pressed !"
 }
